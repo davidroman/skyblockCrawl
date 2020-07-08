@@ -32,19 +32,15 @@ def lambda_handler(event, context):
     for auction_item in auctions_items:
         if auction_item['end'] <= monitor_time:
             print(auction_item['item_name'], ":", auction_item['end'], ":", auction_item['starting_bid'], ":", auction_item['highest_bid_amount'])
-            myKey = auction_item['item_name'] +  auction_item['end']
+            myKey = auction_item['item_name'] +  str(auction_item['end'])
             myValue = auction_item['highest_bid_amount']
-            response = response.update({myKey : myValue})
+            response.update({myKey : myValue})
 
     return {
         'statusCode': 200,
-        'body': json.dumps(response)
+        'body': response
     }
 
 if __name__ == '__main__':
     ## item_name = 'Wise Dragon Helmet' # This variable needs to be an option to the user
-    ## auctions_items = query_auctions(item_name)
     lambda_handler(event, {}) # event ... ?
-    ## for auction_item in auctions_items:
-    ##     if auction_item['end'] <= monitor_time:
-    ##         print(auction_item['item_name'], ":", auction_item['end'], ":", auction_item['starting_bid'], ":", auction_item['highest_bid_amount'])
