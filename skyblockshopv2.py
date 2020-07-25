@@ -15,6 +15,12 @@ from ask_sdk_core.handler_input import HandlerInput
 from ask_sdk_model.ui import SimpleCard
 from ask_sdk_model import Response
 
+time_in_milli = int(round(time.time() * 1000))
+myTime = time.time()
+# print(time_in_milli)
+minutes_to_monitor = 15
+monitor_time = time_in_milli + minutes_to_monitor * 60 * 1000
+
 sb = SkillBuilder()
 
 logger = logging.getLogger(__name__)
@@ -50,7 +56,37 @@ class ShopHandler(AbstractRequestHandler):
         ## nah - data = handler_input.attributes_manager.request_attributes["_"]
 
         # type: (HandlerInput) -> Response
-        speech_text = "You can shop Sky Block by stating an item to learn prices"
+        def query_auctions(item_name):
+            # if not dynamodb:
+            dynamodb = boto3.resource('dynamodb', endpoint_url="https://dynamodb.us-west-2.amazonaws.com")
+
+            table = dynamodb.Table('Auctions')
+            result = table.query(
+              KeyConditionExpression=Key('item_name').eq(item_name)
+            )
+            return result['Items'] # Need to return the correct Items from the table ...
+
+        def lambda_IntentShop(event, context):
+            # Go
+            response = {}
+            item_name = 'Wise Dragon Helmet' # This variable needs to be an option to the user
+            auctions_items = query_auctions(item_name)
+            counter = 1
+            ## calculate how long until item expires ... expires_at = ; and include in the response
+            for auction_item in auctions_items:
+                if auction_item['end'] <= monitor_time:
+                    print(auction_item['item_name'], ":", auction_item['end'], ":", auction_item['starting_bid'], ":", auction_item['highest_bid_amount'])
+                    myKey = auction_item['item_name'] +  str(auction_item['end'])
+                    myValue = auction_item['highest_bid_amount']
+                    response.update({myKey : myValue})
+
+            return {
+                'statusCode': 200,
+                'body': response
+            }
+
+        # speech_text = "You can shop Sky Block by stating an item to learn prices"
+        speech_text_dict = lambda_IntentShop()
         handler_input.response_builder.speak(speech_text).set_card(
             SimpleCard("SkyBlock Shop", speech_text)).set_should_end_session(
             False)

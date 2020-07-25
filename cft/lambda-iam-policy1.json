@@ -11,7 +11,7 @@
 				"dynamodb:PutItem",
 				"dynamodb:UpdateItem"
 			],
-			"Resource": "arn:aws:dynamodb:eu-west-1:123456789012:table/Auctions"
+			"Resource": "arn:aws:dynamodb:us-west-2:AWS_ACCOUNT_NUMBER:table/Auctions"
 		},
 		{
 			"Effect": "Allow",
@@ -19,7 +19,7 @@
 				"logs:CreateLogStream",
 				"logs:PutLogEvents"
 			],
-			"Resource": "arn:aws:logs:eu-west-1:123456789012:*"
+			"Resource": "arn:aws:logs:us-west-2:AWS_ACCOUNT_NUMBER:*"
 		},
 		{
 			"Effect": "Allow",
